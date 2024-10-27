@@ -81,7 +81,7 @@ pushd "$install_dir"
         ep_headings2@${ep_headings2_version} \
         ep_font_size@${ep_font_size_version}
     if [ $mypads -eq 1 ]; then
-        ynh_hide_warnings pnpm run plugins install ep_mypads@${ep_mypads_version}
+        ynh_hide_warnings pnpm run plugins install --no-save ep_mypads@${ep_mypads_version}
     fi
 popd
 
