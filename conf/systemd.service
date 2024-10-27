@@ -10,8 +10,8 @@ WorkingDirectory=__INSTALL_DIR__/
 Environment="PATH=__PATH_WITH_NODEJS__"
 Environment="NODE_ENV=production"
 ExecStart=__NODEJS_DIR__/pnpm run prod
-StandardOutput=append:/var/log/__APP__/etherpad.log
-StandardError=inherit
+#StandardOutput=append:/var/log/__APP__/etherpad.log
+#StandardError=inherit
 Restart=always
 
 # Sandboxing options to harden security
