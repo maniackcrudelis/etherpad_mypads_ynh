@@ -163,6 +163,14 @@
   "showSettingsInAdminPage": true,
 
   /*
+   * Settings for cleanup of pads
+   */
+  "cleanup": {
+    "enabled": false,
+    "keepRevisions": 5
+  },
+
+  /*
    * Node native SSL support
    *
    * This is disabled by default.
@@ -361,6 +369,22 @@ __COMMENT_IF_LDAP_DISABLED__    },
    */
   "cookie": {
     /*
+     * How often (in milliseconds) the key used to sign the express_sid cookie
+     * should be rotated. Long rotation intervals reduce signature verification
+     * overhead (because there are fewer historical keys to check) and database
+     * load (fewer historical keys to store, and less frequent queries to
+     * get/update the keys). Short rotation intervals are slightly more secure.
+     *
+     * Multiple Etherpad processes sharing the same database (table) is
+     * supported as long as the clock sync error is significantly less than this
+     * value.
+     *
+     * Key rotation can be disabled (not recommended) by setting this to 0 or
+     * null, or by disabling session expiration (see sessionLifetime).
+     */
+    "keyRotationInterval": 86400000, // = 1d * 24h/d * 60m/h * 60s/m * 1000ms/s
+
+    /*
      * Value of the SameSite cookie property. "Lax" is recommended unless
      * Etherpad will be embedded in an iframe from another site, in which case
      * this must be set to "None". Note: "None" will not work (the browser will
@@ -441,7 +465,7 @@ __COMMENT_IF_LDAP_DISABLED__    },
      * value to work properly, but increasing the value increases susceptibility
      * to denial of service attacks (malicious clients can exhaust memory).
      */
-    "maxHttpBufferSize": 10000
+    "maxHttpBufferSize": 50000
   },
 
   /*
@@ -491,6 +515,13 @@ __COMMENT_IF_LDAP_DISABLED__    },
   "importMaxFileSize": 52428800, // 50 * 1024 * 1024
 
   /*
+    The authentication method used by the server.
+    The default value is sso
+    If you want to use the old authentication system, change this to apikey
+   */
+  "authenticationMethod": "${AUTHENTICATION_METHOD:sso}",
+
+  /*
    * From Etherpad 1.8.5 onwards, when Etherpad is in production mode commits from individual users are rate limited
    *
    * The default is to allow at most 10 changes per IP in a 1 second window.
@@ -505,7 +536,6 @@ __COMMENT_IF_LDAP_DISABLED__    },
     // maximum number of changes per IP to allow during the rate limit window
     "points": 10
   },
-
 
   /*
    * Toolbar buttons configuration.
@@ -545,6 +575,13 @@ __COMMENT_IF_LDAP_DISABLED__    },
    * Valid values: DEBUG, INFO, WARN, ERROR
    */
   "loglevel": "INFO",
+
+    /*
+   * The log layout type to use.
+   *
+   * Valid values: basic, colored
+   */
+   "logLayoutType": "colored",
 
   /* Override any strings found in locale directories */
   "customLocaleStrings": {},
