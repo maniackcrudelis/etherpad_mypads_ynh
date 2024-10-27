@@ -15,9 +15,9 @@ ynh_nodejs_install
 #=================================================
 # CREATE A MYSQL DATABASE
 #=================================================
-ynh_script_progression "Migrate MySQL database to utf8..."
+#ynh_script_progression "Migrate MySQL database to utf8..."
 
-ynh_mysql_db_shell <<< "ALTER DATABASE $db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
+#ynh_mysql_db_shell <<< "ALTER DATABASE $db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
