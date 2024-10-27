@@ -8,10 +8,14 @@ source /usr/share/yunohost/helpers
 #=================================================
 ynh_script_progression "Activating maintenance mode..."
 
-# Wait for Etherpad to be fully started # (... but why ???)
-# ynh_systemctl --action=restart --wait_until="Your Etherpad version is" --log_path="systemd"
-
 ynh_maintenance_mode_ON
+
+#=================================================
+# UPGRADE DEPENDENCIES
+#=================================================
+ynh_script_progression "Upgrading dependencies..."
+
+ynh_nodejs_install
 
 #=================================================
 # STOP SYSTEMD SERVICE
@@ -32,7 +36,6 @@ ynh_app_setting_set_default --key=useldap --value=0
 ynh_app_setting_set_default --key=path --value="/"
 ynh_app_setting_set_default --key=password --value=$(ynh_string_random --length=32)
 
-# Support full Unicode in MySQL databases
 ynh_mysql_db_shell <<< "ALTER DATABASE $db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 
 #=================================================
@@ -41,13 +44,6 @@ ynh_mysql_db_shell <<< "ALTER DATABASE $db_name CHARACTER SET utf8mb4 COLLATE ut
 ynh_script_progression "Upgrading source files..."
 
 ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="settings.json credentials.json"
-
-#=================================================
-# UPGRADE DEPENDENCIES
-#=================================================
-ynh_script_progression "Upgrading dependencies..."
-
-ynh_nodejs_install
 
 #=================================================
 # CONFIGURE ETHERPAD
@@ -66,7 +62,7 @@ then
     soffice_path="\"$(which soffice)\""
 fi
 
-# Use ldap for mypads
+# Use ldap for MyPads
 comment_if_ldap_disabled="//ldap_disabled"
 if [ $mypads -eq 1 ] && [ $useldap -eq 1 ]
 then
@@ -100,7 +96,7 @@ ynh_script_progression "Upgrading $app..."
 
 pushd "$install_dir"
     ynh_hide_warnings corepack enable && corepack prepare pnpm@latest --activate
-    ynh_hide_warnings pnpm i    
+    ynh_hide_warnings pnpm install
     ynh_hide_warnings pnpm run build:etherpad
     ynh_hide_warnings pnpm run plugins install ep_align@${ep_align_version}
     ynh_hide_warnings pnpm run plugins install ep_author_hover@${ep_author_hover_version}
@@ -108,7 +104,7 @@ pushd "$install_dir"
     ynh_hide_warnings pnpm run plugins install ep_headings2@${ep_headings2_version}
     ynh_hide_warnings pnpm run plugins install ep_font_size@${ep_font_size_version}
     if [ $mypads -eq 1 ]; then
-        ynh_hide_warnings pnpm run plugins install ep_mypads@${mypads_version}
+        ynh_hide_warnings pnpm run plugins install ep_mypads@${ep_mypads_version}
     fi
 popd
 

@@ -70,7 +70,7 @@ ynh_script_progression "Installing $app plugins..."
 
 pushd "$install_dir"
     ynh_hide_warnings corepack enable && corepack prepare pnpm@latest --activate
-    ynh_hide_warnings pnpm i    
+    ynh_hide_warnings pnpm install
     ynh_hide_warnings pnpm run build:etherpad
     ynh_hide_warnings pnpm run plugins install ep_align@${ep_align_version}
     ynh_hide_warnings pnpm run plugins install ep_author_hover@${ep_author_hover_version}
@@ -128,7 +128,6 @@ then
     ynh_replace --match="__LANGUAGE__" --replace="$language" --file="../conf/lang_mypads.sql"
     ynh_mysql_db_shell < "../conf/lang_mypads.sql"
 
-    # Wait for Etherpad to be fully started
     ynh_systemctl --service=$app --action=restart --log_path="/var/log/$app/etherpad.log" --wait_until="Your Etherpad version is"
 fi
 
