@@ -74,22 +74,6 @@ ynh_config_add --template="settings.json" --destination="$install_dir/settings.j
 ynh_config_add --template="credentials.json" --destination="$install_dir/credentials.json"
 
 #=================================================
-# INSTALL ETHERPAD'S PLUGINS
-#=================================================
-
-# If upgrading from an old version and table of content is there, remove it
-if ynh_app_upgrading_from_version_before 1.9.1~ynh3
-then
-    pushd "$install_dir"
-    if ynh_exec_as_app node_load_PATH npm ls 2>/dev/null | grep -q ep_table_of_contents
-    then
-        ynh_script_progression "Uninstalling ep_table_of_contents..."
-        ynh_hide_warnings ynh_exec_as_app npm uninstall ep_table_of_contents
-    fi
-    popd
-fi
-
-#=================================================
 # UPGRADE NPM MODULES
 #=================================================
 ynh_script_progression "Upgrading $app..."
@@ -98,11 +82,11 @@ pushd "$install_dir"
     ynh_hide_warnings corepack enable && corepack prepare pnpm@latest --activate
     ynh_hide_warnings pnpm install
     ynh_hide_warnings pnpm run build:etherpad
-    ynh_hide_warnings pnpm run plugins install ep_align@${ep_align_version}
-    ynh_hide_warnings pnpm run plugins install ep_author_hover@${ep_author_hover_version}
-    ynh_hide_warnings pnpm run plugins install ep_delete_empty_pads@${ep_delete_empty_pads_version}
-    ynh_hide_warnings pnpm run plugins install ep_headings2@${ep_headings2_version}
-    ynh_hide_warnings pnpm run plugins install ep_font_size@${ep_font_size_version}
+    ynh_hide_warnings pnpm run plugins install ep_align@${ep_align_version} \
+        ep_author_hover@${ep_author_hover_version} \
+        ep_delete_empty_pads@${ep_delete_empty_pads_version} \
+        ep_headings2@${ep_headings2_version} \
+        ep_font_size@${ep_font_size_version}
     if [ $mypads -eq 1 ]; then
         ynh_hide_warnings pnpm run plugins install ep_mypads@${ep_mypads_version}
     fi
