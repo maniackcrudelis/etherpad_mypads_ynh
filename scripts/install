@@ -75,7 +75,7 @@ pushd "$install_dir"
     ynh_hide_warnings corepack enable && corepack prepare pnpm@latest --activate
     ynh_hide_warnings pnpm install
     ynh_hide_warnings pnpm run build:etherpad
-    ynh_hide_warnings pnpm run plugins install ep_align@${ep_align_version} \
+    ynh_hide_warnings pnpm run plugins install --no-save --legacy-peer-deps ep_align@${ep_align_version} \
         ep_author_hover@${ep_author_hover_version} \
         ep_delete_empty_pads@${ep_delete_empty_pads_version} \
         ep_headings2@${ep_headings2_version} \
