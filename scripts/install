@@ -76,7 +76,7 @@ pushd "$install_dir"
     #ynh_hide_warnings ynh_exec_as_app COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm --recursive install --production 
     #ynh_hide_warnings ynh_exec_as_app pnpm run build:etherpad
 
-    ynh_exec_as_app ETHERPAD_PRODUCTION=true bin/installDeps.sh
+    ynh_exec_as_app ETHERPAD_PRODUCTION=true COREPACK_ENABLE_DOWNLOAD_PROMPT=0 bin/installDeps.sh
 
     ynh_hide_warnings ynh_exec_as_app pnpm run plugins install --no-save ep_align@${ep_align_version} \
         ep_author_hover@${ep_author_hover_version} \
