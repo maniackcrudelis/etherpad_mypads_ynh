@@ -17,7 +17,6 @@ ep_delete_empty_pads_version=0.0.10
 ep_headings2_version=0.2.65
 ep_font_size_version=0.4.62
 
-
 #=================================================
 # CUSTOM HELPERS
 #=================================================
