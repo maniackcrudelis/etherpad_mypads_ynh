@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #=================================================
-# COMMON VARIABLES AND CUSTOM HELPERS
+# COMMON VARIABLES
 #=================================================
 
 nodejs_version=22
@@ -18,7 +18,9 @@ ep_headings2_version=0.2.65
 ep_font_size_version=0.4.62
 
 
-
+#=================================================
+# CUSTOM HELPERS
+#=================================================
 
 ynh_maintenance_mode_ON () {
 	mkdir -p /var/www/html/
