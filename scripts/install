@@ -73,7 +73,7 @@ ynh_script_progression "Installing $app and plugins..."
 
 pushd "$install_dir"
     ynh_hide_warnings corepack enable && corepack prepare pnpm@latest --activate
-    ynh_hide_warnings pnpm install --production 
+    ynh_hide_warnings pnpm install
     ynh_hide_warnings pnpm run build:etherpad
     ynh_hide_warnings pnpm run plugins install --no-save \
     	ep_align@${ep_align_version} \
