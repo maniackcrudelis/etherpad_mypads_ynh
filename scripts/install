@@ -64,7 +64,7 @@ ynh_config_add --template="settings.json" --destination="$install_dir/settings.j
 chmod 600 "$install_dir/settings.json"
 
 ynh_config_add --template="credentials.json" --destination="$install_dir/credentials.json"
-chmod 600 "$install_dir/credentials.json"
+chmod 400 "$install_dir/credentials.json"
 
 #=================================================
 # INSTALL ETHERPAD'S PLUGINS
