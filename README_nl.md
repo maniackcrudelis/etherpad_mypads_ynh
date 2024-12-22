@@ -5,7 +5,9 @@ Hij mag NIET handmatig aangepast worden.
 
 # Etherpad MyPads voor Yunohost
 
-[![Integratieniveau](https://dash.yunohost.org/integration/etherpad_mypads.svg)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/) ![Mate van functioneren](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.status.svg) ![Onderhoudsstatus](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.maintain.svg)
+[![Integratieniveau](https://apps.yunohost.org/badge/integration/etherpad_mypads)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/)
+![Mate van functioneren](https://apps.yunohost.org/badge/state/etherpad_mypads)
+![Onderhoudsstatus](https://apps.yunohost.org/badge/maintained/etherpad_mypads)
 
 [![Etherpad MyPads met Yunohost installeren](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=etherpad_mypads)
 
@@ -29,7 +31,7 @@ This version of Etherpad is preconfigured with a collection of plugins:
 
 
 
-**Geleverde versie:** 2.2.5~ynh1
+**Geleverde versie:** 2.2.6~ynh1
 
 **Demo:** <https://video.etherpad.com>
 
