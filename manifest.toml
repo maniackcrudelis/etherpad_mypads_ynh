@@ -5,7 +5,7 @@ name = "Etherpad MyPads"
 description.en = "Online editor providing collaborative editing in real-time"
 description.fr = "Éditeur en ligne fournissant l'édition collaborative en temps réel"
 
-version = "2.2.5~ynh1"
+version = "2.2.6~ynh1"
 
 maintainers = []
 
@@ -22,7 +22,6 @@ architectures = ["arm64", "amd64"]
 multi_instance = true
 
 ldap = false
-
 sso = false
 
 disk = "200M"
@@ -83,8 +82,8 @@ ram.runtime = "50M"
     [resources.sources]
 
         [resources.sources.main]
-        url = "https://github.com/ether/etherpad-lite/archive/refs/tags/2.2.5.tar.gz"
-        sha256 = "53746985a4e5d42fc293f555077f77b47579c9bad4dc2af8ac783642f2e519bd"
+        url = "https://github.com/ether/etherpad-lite/archive/refs/tags/2.2.6.tar.gz"
+        sha256 = "6265dfa161255ddf408c8b0a07cc7a65c18d51286c660f9b6314d0fed13141ea"
         autoupdate.strategy = "latest_github_tag"
 
     [resources.system_user]
