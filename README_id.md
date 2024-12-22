@@ -5,7 +5,9 @@ Ini TIDAK boleh diedit dengan tangan.
 
 # Etherpad MyPads untuk YunoHost
 
-[![Tingkat integrasi](https://dash.yunohost.org/integration/etherpad_mypads.svg)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/) ![Status kerja](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.status.svg) ![Status pemeliharaan](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.maintain.svg)
+[![Tingkat integrasi](https://apps.yunohost.org/badge/integration/etherpad_mypads)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/)
+![Status kerja](https://apps.yunohost.org/badge/state/etherpad_mypads)
+![Status pemeliharaan](https://apps.yunohost.org/badge/maintained/etherpad_mypads)
 
 [![Pasang Etherpad MyPads dengan YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=etherpad_mypads)
 
@@ -29,7 +31,7 @@ This version of Etherpad is preconfigured with a collection of plugins:
 
 
 
-**Versi terkirim:** 2.2.5~ynh1
+**Versi terkirim:** 2.2.6~ynh1
 
 **Demo:** <https://video.etherpad.com>
 

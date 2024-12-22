@@ -5,7 +5,9 @@
 
 # Etherpad MyPads для YunoHost
 
-[![Уровень интеграции](https://dash.yunohost.org/integration/etherpad_mypads.svg)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/) ![Состояние работы](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.status.svg) ![Состояние сопровождения](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.maintain.svg)
+[![Уровень интеграции](https://apps.yunohost.org/badge/integration/etherpad_mypads)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/)
+![Состояние работы](https://apps.yunohost.org/badge/state/etherpad_mypads)
+![Состояние сопровождения](https://apps.yunohost.org/badge/maintained/etherpad_mypads)
 
 [![Установите Etherpad MyPads с YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=etherpad_mypads)
 
@@ -29,7 +31,7 @@ This version of Etherpad is preconfigured with a collection of plugins:
 
 
 
-**Поставляемая версия:** 2.2.5~ynh1
+**Поставляемая версия:** 2.2.6~ynh1
 
 **Демо-версия:** <https://video.etherpad.com>
 
