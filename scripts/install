@@ -88,12 +88,12 @@ if [ $mypads -eq 1 ]
 then
     ynh_script_progression "Tweaking MyPad configuration..."
 
-    # Add a link to Etherpad to allow anonymous pads creation from MyPads.
-    ynh_replace --match="^ *\"DESCRIPTION\": .*</ul>" --replace="&<a href=../>Pads anonymes</a>" --file=$install_dir/node_modules/ep_mypads/static/l10n/fr.json
-    ynh_replace --match="^ *\"DESCRIPTION\": .*</ul>" --replace="&<a href=../>Anonymous pads</a>" --file=$install_dir/node_modules/ep_mypads/static/l10n/en.json
-    # And a link to Etherpad admin from MyPads.
-    ynh_replace --match="^ *\"FOOTER\": .*2.0" --replace="& | <a href='../admin'>Etherpad admin</a>" --file=$install_dir/node_modules/ep_mypads/static/l10n/en.json
-    ynh_replace --match="^ *\"FOOTER\": .*2.0" --replace="& | <a href='../admin'>Etherpad admin</a>" --file=$install_dir/node_modules/ep_mypads/static/l10n/fr.json
+	# Add a link to Etherpad to allow anonymous pads creation from MyPads.
+	ynh_replace --match="^ *\"DESCRIPTION\": .*</ul>" --replace="&<a href=../>Pads anonymes</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
+	ynh_replace --match="^ *\"DESCRIPTION\": .*</ul>" --replace="&<a href=../>Anonymous pads</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
+	# And a link to Etherpad admin from MyPads.
+	ynh_replace --match="^ *\"FOOTER\": .*2.0" --replace="& | <a href='../admin'>Etherpad admin</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
+	ynh_replace --match="^ *\"FOOTER\": .*2.0" --replace="& | <a href='../admin'>Etherpad admin</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
 
     # Find the /div just after the field to open a pad in order to add a link to MyPads plugin.
     sed -i '157i<center><br><font size="4"><a href="./mypads/" style="text-decoration: none; color: #555">MyPads</a></font></center>' $install_dir/src/templates/index.html

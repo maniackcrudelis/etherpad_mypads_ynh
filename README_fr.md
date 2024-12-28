@@ -30,7 +30,7 @@ Cette version d'Etherpad est préconfigurée avec une collection de plugins:
 - [ep_headings2](https://www.npmjs.com/package/ep_headings2) - *Possibilité de définir des titres*
 
 
-**Version incluse :** 2.2.6~ynh1
+**Version incluse :** 2.2.7~ynh1
 
 **Démo :** <https://video.etherpad.com>
 
