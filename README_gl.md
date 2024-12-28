@@ -31,7 +31,7 @@ This version of Etherpad is preconfigured with a collection of plugins:
 
 
 
-**Versión proporcionada:** 2.2.6~ynh1
+**Versión proporcionada:** 2.2.7~ynh1
 
 **Demo:** <https://video.etherpad.com>
 
