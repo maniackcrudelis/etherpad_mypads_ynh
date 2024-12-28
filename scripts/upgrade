@@ -6,95 +6,49 @@ source /usr/share/yunohost/helpers
 #=================================================
 # ACTIVATE MAINTENANCE MODE
 #=================================================
-ynh_script_progression --message="Activating maintenance mode..." --weight=2
-
-# Wait for Etherpad to be fully started # (... but why ???)
-ynh_systemd_action --action=restart --line_match="Your Etherpad version is" --log_path="systemd"
+ynh_script_progression "Activating maintenance mode..."
 
 ynh_maintenance_mode_ON
 
 #=================================================
-# STANDARD UPGRADE STEPS
+# UPGRADE DEPENDENCIES
+#=================================================
+ynh_script_progression "Upgrading dependencies..."
+
+ynh_nodejs_install
+
 #=================================================
 # STOP SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Stopping a systemd service..." --weight=3
+ynh_script_progression "Stopping $app's systemd service..."
 
-ynh_systemd_action --service_name=$app --action="stop"
+ynh_systemctl --service=$app --action="stop"
 
 #=================================================
 # ENSURE DOWNWARD COMPATIBILITY
 #=================================================
-ynh_script_progression --message="Ensuring downward compatibility..." --weight=2
+ynh_script_progression "Ensuring downward compatibility..."
 
-if [ -z "${language:-}" ]; then
-    # If upgrading from a version which doesn't support translations, set language to English by default
-    language=en
-    ynh_app_setting_set --app=$app --key=language --value=$language
-fi
+ynh_app_setting_set_default --key=anguage --value=en
+ynh_app_setting_set_default --key=export --value=none
+ynh_app_setting_set_default --key=mypads --value=1
+ynh_app_setting_set_default --key=useldap --value=0
+ynh_app_setting_set_default --key=path --value="/"
+ynh_app_setting_set_default --key=password --value=$(ynh_string_random --length=32)
 
-if [ -z "${export:-}" ]; then
-	export=none
-	ynh_app_setting_set --app=$app --key=export --value=$export
-fi
-
-if [ -z "${mypads:-}" ]; then
-	mypads=1
-	ynh_app_setting_set --app=$app --key=mypads --value=$mypads
-fi
-
-if [ -z "${useldap:-}" ]; then
-	useldap=0
-	ynh_app_setting_set --app=$app --key=useldap --value=$useldap
-fi
-
-if [ -z "${path:-}" ]; then
-	path="/"
-	ynh_app_setting_set --app=$app --key=path --value=$path
-fi
-
-if [ -z "${password:-}" ]; then
-	password=$(ynh_string_random --length=32)
-	ynh_app_setting_set --app=$app --key=password --value="$password"
-fi
-
-# Support full Unicode in MySQL databases
-ynh_mysql_connect_as --user=$db_user --password="$db_pwd" --database=$db_name \
-    <<< "ALTER DATABASE $db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
+#ynh_mysql_db_shell <<< "ALTER DATABASE $db_name CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;"
 
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
-ynh_script_progression --message="Upgrading source files..." --weight=4
+ynh_script_progression "Upgrading source files..."
 
-# Download, check integrity, uncompress and patch the source from app.src
-ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="settings.json credentials.json"
-
-chmod -R o-rwx "$install_dir"
-chown -R $app:$app "$install_dir"
-
-#=================================================
-# UPGRADE DEPENDENCIES
-#=================================================
-ynh_script_progression --message="Upgrading dependencies..." --weight=5
-
-ynh_install_nodejs --nodejs_version=$nodejs_version
-ynh_use_nodejs
-
-#=================================================
-# SPECIFIC UPGRADE
-#=================================================
-# HANDLE LOG FILES AND LOGROTATE
-#=================================================
-ynh_script_progression --message="Configuring log rotation..." --weight=1
-
-# Create log directory
-chown $app -R /var/log/$app
+ynh_setup_source --dest_dir="$install_dir" --full_replace --keep="settings.json credentials.json"
 
 #=================================================
 # CONFIGURE ETHERPAD
 #=================================================
-ynh_script_progression --message="Configure $app..."
+ynh_script_progression "Configure $app..."
 
 abiword_path="null"
 soffice_path="null"
@@ -107,7 +61,7 @@ then
     soffice_path="\"$(which soffice)\""
 fi
 
-# Use ldap for mypads
+# Use ldap for MyPads
 comment_if_ldap_disabled="//ldap_disabled"
 if [ $mypads -eq 1 ] && [ $useldap -eq 1 ]
 then
@@ -115,34 +69,29 @@ then
 fi
 
 # Calculate and store the config file checksum into the app settings
-
-ynh_add_config --template="settings.json" --destination="$install_dir/settings.json"
-ynh_add_config --template="credentials.json" --destination="$install_dir/credentials.json"
-
+ynh_config_add --template="settings.json" --destination="$install_dir/settings.json"
 chmod 600 "$install_dir/settings.json"
-chown $app:$app "$install_dir/settings.json"
 
+ynh_config_add --template="credentials.json" --destination="$install_dir/credentials.json"
 chmod 600 "$install_dir/credentials.json"
-chown $app:$app "$install_dir/credentials.json"
 
 #=================================================
 # UPGRADE NPM MODULES
 #=================================================
-ynh_script_progression --message="Upgrading $app..." --weight=10
+ynh_script_progression "Upgrading $app..."
 
-pushd $install_dir
-	ynh_exec_warn_less env $ynh_node_load_PATH corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@latest --activate
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH ETHERPAD_PRODUCTION=true COREPACK_ENABLE_DOWNLOAD_PROMPT=0 bin/installDeps.sh && \
- 		ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH pnpm run install-plugins \
-		ep_align@${ep_align_version} \
-  		ep_author_hover@${ep_author_hover_version} \
-  		ep_delete_empty_pads@${ep_delete_empty_pads_version} \
-  		ep_headings2@${ep_headings2_version} \
-  		ep_font_size@${ep_font_size_version}
-	if [ $mypads -eq 1 ]; then
-		ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH pnpm run install-plugins \
-		ep_mypads@${mypads_version}
-	fi
+pushd "$install_dir"
+    ynh_hide_warnings corepack enable && corepack prepare pnpm@latest --activate
+    ynh_hide_warnings pnpm install
+    ynh_hide_warnings pnpm run build:etherpad
+    ynh_hide_warnings pnpm run plugins install ep_align@${ep_align_version} \
+        ep_author_hover@${ep_author_hover_version} \
+        ep_delete_empty_pads@${ep_delete_empty_pads_version} \
+        ep_headings2@${ep_headings2_version} \
+        ep_font_size@${ep_font_size_version}
+    if [ $mypads -eq 1 ]; then
+        ynh_hide_warnings pnpm run plugins install ep_mypads@${mypads_version}
+    fi
 popd
 
 #=================================================
@@ -154,11 +103,11 @@ then
 	ynh_script_progression --message="Tweaking MyPads configuration..." --weight=1
 
 	# Add a link to Etherpad to allow anonymous pads creation from MyPads.
-	ynh_replace_string --match_string="^ *\"DESCRIPTION\": .*</ul>" --replace_string="&<a href=../>Pads anonymes</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
-	ynh_replace_string --match_string="^ *\"DESCRIPTION\": .*</ul>" --replace_string="&<a href=../>Anonymous pads</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
+	ynh_replace --match="^ *\"DESCRIPTION\": .*</ul>" --replace="&<a href=../>Pads anonymes</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
+	ynh_replace --match="^ *\"DESCRIPTION\": .*</ul>" --replace="&<a href=../>Anonymous pads</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
 	# And a link to Etherpad admin from MyPads.
-	ynh_replace_string --match_string="^ *\"FOOTER\": .*2.0" --replace_string="& | <a href='../admin'>Etherpad admin</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
-	ynh_replace_string --match_string="^ *\"FOOTER\": .*2.0" --replace_string="& | <a href='../admin'>Etherpad admin</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
+	ynh_replace --match="^ *\"FOOTER\": .*2.0" --replace="& | <a href='../admin'>Etherpad admin</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
+	ynh_replace --match="^ *\"FOOTER\": .*2.0" --replace="& | <a href='../admin'>Etherpad admin</a>" --file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
 
 	# Find the /div just after the field to open a pad in order to add a link to MyPads plugin.
 	sed -i '157i<center><br><font size="4"><a href="./mypads/" style="text-decoration: none; color: #555">MyPads</a></font></center>' $install_dir/src/templates/index.html
@@ -167,37 +116,29 @@ fi
 #=================================================
 # REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+ynh_script_progression "Upgrading system configurations related to $app..."
 
-ynh_add_nginx_config
+ynh_config_add_nginx
 
-ynh_add_systemd_config
+ynh_config_add_systemd
 
-# Integrate in YunoHost
-yunohost service add $app --description="Collaborative editor" --log="/var/log/$app/etherpad.log"
+yunohost service add $app --description="Collaborative editor"
 
-# Use logrotate to manage app-specific logfile(s)
-ynh_use_logrotate --non-append --specific_user=$app/$app
+ynh_config_add_logrotate
+
+ynh_config_add_fail2ban --logpath="/var/log/nginx/$domain-access.log" --failregex="<HOST> .* .POST /mypads/api/auth/login HTTP/1.1. 400"
 
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting systemd service..." --weight=9
+ynh_script_progression "Starting systemd service..."
 
-ynh_systemd_action --service_name=$app --action=restart --line_match="Your Etherpad version is" --log_path="systemd"
-
-#=================================================
-# UPGRADE FAIL2BAN
-#=================================================
-ynh_script_progression --message="Reconfiguring Fail2Ban..." --weight=8
-
-# Create a dedicated Fail2Ban config
-ynh_add_fail2ban_config --logpath="/var/log/nginx/$domain-access.log" --failregex="<HOST> .* .POST /mypads/api/auth/login HTTP/1.1. 400" --max_retry=5
+ynh_systemctl --service=$app --action=restart --log_path="/var/log/$app/etherpad.log" --wait_until="Your Etherpad version is"
 
 #=================================================
 # DEACTIVE MAINTENANCE MODE
 #=================================================
-ynh_script_progression --message="Disabling maintenance mode..." --weight=5
+ynh_script_progression "Disabling maintenance mode..."
 
 ynh_maintenance_mode_OFF
 
@@ -205,4 +146,4 @@ ynh_maintenance_mode_OFF
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Upgrade of $app completed" --last
+ynh_script_progression "Upgrade of $app completed"

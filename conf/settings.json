@@ -163,6 +163,14 @@
   "showSettingsInAdminPage": true,
 
   /*
+   * Settings for cleanup of pads
+   */
+  "cleanup": {
+    "enabled": false,
+    "keepRevisions": 5
+  },
+
+  /*
    * Node native SSL support
    *
    * This is disabled by default.
@@ -230,45 +238,50 @@
     "pageDown":  true
   },
 
-  // Plugins config
+  /*
+   * Enables the use of a different server. We have a different one that syncs changes from the original server.
+   * It is hosted on GitHub and should not be blocked by many firewalls.
+   *  https://etherpad.org/ep_infos
+   */
+   "updateServer": "https://etherpad.org/ep_infos",
 
-		// ep_markdown
-		"ep_markdown_default": false,	// Setting as default
+    // ep_markdown
+    "ep_markdown_default": false, // Setting as default
 
   // Other plugins config
-	// ep_comments_page
-		// Display comments as icons, not boxes
-		"ep_comments_page": {
-			"displayCommentAsIcon": false
-		},
-		// Highlight selected text when adding comment
-		"ep_comments_page": {
-			"highlightSelectedText": false
-		},
-		// ep_mypads
-__COMMENT_IF_LDAP_DISABLED__		"ep_mypads": {
-__COMMENT_IF_LDAP_DISABLED__			"ldap": {
-__COMMENT_IF_LDAP_DISABLED__				// Your LDAP URL
-__COMMENT_IF_LDAP_DISABLED__				"url": "ldap://127.0.0.1",
-__COMMENT_IF_LDAP_DISABLED__				// Where to search your users
-__COMMENT_IF_LDAP_DISABLED__				"searchBase": "ou=users,dc=yunohost,dc=org",
-__COMMENT_IF_LDAP_DISABLED__				// A LDAP filter ({{username}} is replaced by user's login)
-__COMMENT_IF_LDAP_DISABLED__				"searchFilter": "(&(|(objectclass=posixAccount))(uid={{username}}))",
-__COMMENT_IF_LDAP_DISABLED__				// LDAP properties mapping for MyPads
-__COMMENT_IF_LDAP_DISABLED__				"properties": {
-__COMMENT_IF_LDAP_DISABLED__					// Which LDAP property will be used as user's login?
-__COMMENT_IF_LDAP_DISABLED__					"login": "uid",
-__COMMENT_IF_LDAP_DISABLED__					// as user's email
-__COMMENT_IF_LDAP_DISABLED__					"email": "mail",
-__COMMENT_IF_LDAP_DISABLED__					// as user's firstname
-__COMMENT_IF_LDAP_DISABLED__					"firstname": "givenName",
-__COMMENT_IF_LDAP_DISABLED__					// as users's lastname
-__COMMENT_IF_LDAP_DISABLED__					"lastname": "sn"
-__COMMENT_IF_LDAP_DISABLED__				},
-__COMMENT_IF_LDAP_DISABLED__				// Default langage for LDAP created users
-__COMMENT_IF_LDAP_DISABLED__				"defaultLang": "__LANGUAGE__"
-__COMMENT_IF_LDAP_DISABLED__			}
-__COMMENT_IF_LDAP_DISABLED__		},
+  // ep_comments_page
+    // Display comments as icons, not boxes
+    "ep_comments_page": {
+      "displayCommentAsIcon": false
+    },
+    // Highlight selected text when adding comment
+    "ep_comments_page": {
+      "highlightSelectedText": false
+    },
+    // ep_mypads
+__COMMENT_IF_LDAP_DISABLED__    "ep_mypads": {
+__COMMENT_IF_LDAP_DISABLED__      "ldap": {
+__COMMENT_IF_LDAP_DISABLED__        // Your LDAP URL
+__COMMENT_IF_LDAP_DISABLED__        "url": "ldap://127.0.0.1",
+__COMMENT_IF_LDAP_DISABLED__        // Where to search your users
+__COMMENT_IF_LDAP_DISABLED__        "searchBase": "ou=users,dc=yunohost,dc=org",
+__COMMENT_IF_LDAP_DISABLED__        // A LDAP filter ({{username}} is replaced by user's login)
+__COMMENT_IF_LDAP_DISABLED__        "searchFilter": "(&(|(objectclass=posixAccount))(uid={{username}}))",
+__COMMENT_IF_LDAP_DISABLED__        // LDAP properties mapping for MyPads
+__COMMENT_IF_LDAP_DISABLED__        "properties": {
+__COMMENT_IF_LDAP_DISABLED__          // Which LDAP property will be used as user's login?
+__COMMENT_IF_LDAP_DISABLED__          "login": "uid",
+__COMMENT_IF_LDAP_DISABLED__          // as user's email
+__COMMENT_IF_LDAP_DISABLED__          "email": "mail",
+__COMMENT_IF_LDAP_DISABLED__          // as user's firstname
+__COMMENT_IF_LDAP_DISABLED__          "firstname": "givenName",
+__COMMENT_IF_LDAP_DISABLED__          // as users's lastname
+__COMMENT_IF_LDAP_DISABLED__          "lastname": "sn"
+__COMMENT_IF_LDAP_DISABLED__        },
+__COMMENT_IF_LDAP_DISABLED__        // Default langage for LDAP created users
+__COMMENT_IF_LDAP_DISABLED__        "defaultLang": "__LANGUAGE__"
+__COMMENT_IF_LDAP_DISABLED__      }
+__COMMENT_IF_LDAP_DISABLED__    },
 
   /*
    * Should we suppress errors from being visible in the default Pad Text?
@@ -323,14 +336,6 @@ __COMMENT_IF_LDAP_DISABLED__		},
   "soffice" : __SOFFICE_PATH__,
 
   /*
-   * Path to the Tidy executable.
-   *
-   * Tidy is used to improve the quality of exported pads.
-   * Setting it to null disables Tidy.
-   */
-  "tidyHtml": null,
-
-  /*
    * Allow import of file types other than the supported ones:
    * txt, doc, docx, rtf, odt, html & htm
    */
@@ -363,6 +368,22 @@ __COMMENT_IF_LDAP_DISABLED__		},
    * Settings controlling the session cookie issued by Etherpad.
    */
   "cookie": {
+    /*
+     * How often (in milliseconds) the key used to sign the express_sid cookie
+     * should be rotated. Long rotation intervals reduce signature verification
+     * overhead (because there are fewer historical keys to check) and database
+     * load (fewer historical keys to store, and less frequent queries to
+     * get/update the keys). Short rotation intervals are slightly more secure.
+     *
+     * Multiple Etherpad processes sharing the same database (table) is
+     * supported as long as the clock sync error is significantly less than this
+     * value.
+     *
+     * Key rotation can be disabled (not recommended) by setting this to 0 or
+     * null, or by disabling session expiration (see sessionLifetime).
+     */
+    "keyRotationInterval": 86400000, // = 1d * 24h/d * 60m/h * 60s/m * 1000ms/s
+
     /*
      * Value of the SameSite cookie property. "Lax" is recommended unless
      * Etherpad will be embedded in an iframe from another site, in which case
@@ -444,7 +465,7 @@ __COMMENT_IF_LDAP_DISABLED__		},
      * value to work properly, but increasing the value increases susceptibility
      * to denial of service attacks (malicious clients can exhaust memory).
      */
-    "maxHttpBufferSize": 10000
+    "maxHttpBufferSize": 50000
   },
 
   /*
@@ -494,6 +515,13 @@ __COMMENT_IF_LDAP_DISABLED__		},
   "importMaxFileSize": 52428800, // 50 * 1024 * 1024
 
   /*
+    The authentication method used by the server.
+    The default value is sso
+    If you want to use the old authentication system, change this to apikey
+   */
+  "authenticationMethod": "${AUTHENTICATION_METHOD:sso}",
+
+  /*
    * From Etherpad 1.8.5 onwards, when Etherpad is in production mode commits from individual users are rate limited
    *
    * The default is to allow at most 10 changes per IP in a 1 second window.
@@ -508,7 +536,6 @@ __COMMENT_IF_LDAP_DISABLED__		},
     // maximum number of changes per IP to allow during the rate limit window
     "points": 10
   },
-
 
   /*
    * Toolbar buttons configuration.
@@ -548,6 +575,13 @@ __COMMENT_IF_LDAP_DISABLED__		},
    * Valid values: DEBUG, INFO, WARN, ERROR
    */
   "loglevel": "INFO",
+
+    /*
+   * The log layout type to use.
+   *
+   * Valid values: basic, colored
+   */
+   "logLayoutType": "colored",
 
   /* Override any strings found in locale directories */
   "customLocaleStrings": {},
