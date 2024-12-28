@@ -36,7 +36,7 @@ ynh_change_url_nginx_config
 ynh_script_progression --message="Starting a systemd service..." --weight=10
 
 # Start a systemd service
-ynh_systemd_action --service_name=$app --action=restart --line_match="You can access your Etherpad instance at" --log_path="/var/log/$app/etherpad.log" --timeout="120"
+ynh_systemd_action --service_name=$app --action=restart --line_match="Your Etherpad version is" --log_path="systemd"
 
 #=================================================
 # DEACTIVE MAINTENANCE MODE

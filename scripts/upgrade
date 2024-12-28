@@ -3,15 +3,13 @@
 source _common.sh
 source /usr/share/yunohost/helpers
 
-upgrade_type=$(ynh_check_app_version_changed)
-
 #=================================================
 # ACTIVATE MAINTENANCE MODE
 #=================================================
 ynh_script_progression --message="Activating maintenance mode..." --weight=2
 
-# Wait for etherpad to be fully started # (... but why ???)
-ynh_systemd_action --action=restart --line_match="You can access your Etherpad instance at" --log_path="/var/log/$app/etherpad.log" --timeout="120"
+# Wait for Etherpad to be fully started # (... but why ???)
+ynh_systemd_action --action=restart --line_match="Your Etherpad version is" --log_path="systemd"
 
 ynh_maintenance_mode_ON
 
@@ -67,14 +65,10 @@ ynh_mysql_connect_as --user=$db_user --password="$db_pwd" --database=$db_name \
 #=================================================
 # DOWNLOAD, CHECK AND UNPACK SOURCE
 #=================================================
+ynh_script_progression --message="Upgrading source files..." --weight=4
 
-if [ "$upgrade_type" == "UPGRADE_APP" ]
-then
-	ynh_script_progression --message="Upgrading source files..." --weight=4
-
-	# Download, check integrity, uncompress and patch the source from app.src
-	ynh_setup_source --dest_dir="$install_dir" --keep="settings.json credentials.json"
-fi
+# Download, check integrity, uncompress and patch the source from app.src
+ynh_setup_source --dest_dir="$install_dir" --full_replace=1 --keep="settings.json credentials.json"
 
 chmod -R o-rwx "$install_dir"
 chown -R $app:$app "$install_dir"
@@ -86,13 +80,6 @@ ynh_script_progression --message="Upgrading dependencies..." --weight=5
 
 ynh_install_nodejs --nodejs_version=$nodejs_version
 ynh_use_nodejs
-
-#=================================================
-# NGINX CONFIGURATION
-#=================================================
-ynh_script_progression --message="Upgrading NGINX web server configuration..." --weight=2
-
-ynh_add_nginx_config
 
 #=================================================
 # SPECIFIC UPGRADE
@@ -107,8 +94,7 @@ chown $app -R /var/log/$app
 #=================================================
 # CONFIGURE ETHERPAD
 #=================================================
-
-ynh_script_progression --message="Configure etherpad..."
+ynh_script_progression --message="Configure $app..."
 
 abiword_path="null"
 soffice_path="null"
@@ -140,75 +126,50 @@ chmod 600 "$install_dir/credentials.json"
 chown $app:$app "$install_dir/credentials.json"
 
 #=================================================
-# INSTALL ETHERPAD'S PLUGINS
-#=================================================
-
-# If upgrading from an old version and table of content is there, remove it
-if ynh_compare_current_package_version --comparison lt --version 1.9.1~ynh3
-then
-    pushd "$install_dir"
-    if ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm ls 2>/dev/null | grep -q ep_table_of_contents
-    then
-        ynh_script_progression --message="Uninstalling ep_table_of_contents..." --weight=2
-            ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm uninstall ep_table_of_contents 
-    fi
-    popd
-fi
-
-ynh_script_progression --message="Installing Etherpad plugins..." --weight=10
-
-pushd "$install_dir"
-	# Add Left/Center/Right/Justify to lines of text in a pad
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_align@${ep_align_version}
-	# Framapad - Adds author names to span titles
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_author_hover@${ep_author_hover_version}
-	# Framapad - Adds comments on sidebar and link it to the text.
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_comments_page@${ep_comments_page_version}
-	# Framapad - Displays paragraphs, sentences, words and characters counts.
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_countable@${ep_countable_version}
-	# Framapad - Delete pads which were never edited
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_delete_empty_pads@${ep_delete_empty_pads_version}
-	# Framapad - Apply colors to fonts
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_font_color@${ep_font_color_version}
-	# Framapad - Adds heading support to Etherpad Lite.
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_headings2@${ep_headings2_version}
-	# Framapad - Edit and Export as Markdown in Etherpad
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_markdown@${ep_markdown_version}
-	if [ $mypads -eq 1 ]; then
-		# Framapad - Groups and private pads for Etherpad
-		ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_mypads@${mypads_version}
-	fi
-	# Framapad - Add support to do 'Spell checking'
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_spellcheck@${ep_spellcheck_version}
-	# Framapad - Add support for Subscript and Superscript
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_subscript_and_superscript@${ep_subscript_and_superscript_version}
-	# Framapad - User Pad Contents font size can be set in settings, this does not effect other peoples views
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH $ynh_npm install --no-save ep_font_size@${ep_font_size_version}
-popd
-
-#=================================================
 # UPGRADE NPM MODULES
 #=================================================
-ynh_script_progression --message="Upgrading Etherpad..." --weight=10
+ynh_script_progression --message="Upgrading $app..." --weight=10
 
 pushd $install_dir
-	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH ETHERPAD_PRODUCTION=true src/bin/installDeps.sh
+	ynh_exec_warn_less env $ynh_node_load_PATH corepack enable && COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare pnpm@latest --activate
+	ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH ETHERPAD_PRODUCTION=true COREPACK_ENABLE_DOWNLOAD_PROMPT=0 bin/installDeps.sh && \
+ 		ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH pnpm run install-plugins \
+		ep_align@${ep_align_version} \
+  		ep_author_hover@${ep_author_hover_version} \
+  		ep_delete_empty_pads@${ep_delete_empty_pads_version} \
+  		ep_headings2@${ep_headings2_version} \
+  		ep_font_size@${ep_font_size_version}
+	if [ $mypads -eq 1 ]; then
+		ynh_exec_warn_less ynh_exec_as $app env $ynh_node_load_PATH pnpm run install-plugins \
+		ep_mypads@${mypads_version}
+	fi
 popd
 
 #=================================================
 # ADD MYPADS LINK
 #=================================================
 
-if [ "$upgrade_type" == "UPGRADE_APP" ] && [ $mypads -eq 1 ]
+if [ $mypads -eq 1 ]
 then
+	ynh_script_progression --message="Tweaking MyPads configuration..." --weight=1
+
+	# Add a link to Etherpad to allow anonymous pads creation from MyPads.
+	ynh_replace_string --match_string="^ *\"DESCRIPTION\": .*</ul>" --replace_string="&<a href=../>Pads anonymes</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
+	ynh_replace_string --match_string="^ *\"DESCRIPTION\": .*</ul>" --replace_string="&<a href=../>Anonymous pads</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
+	# And a link to Etherpad admin from MyPads.
+	ynh_replace_string --match_string="^ *\"FOOTER\": .*2.0" --replace_string="& | <a href='../admin'>Etherpad admin</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/en.json
+	ynh_replace_string --match_string="^ *\"FOOTER\": .*2.0" --replace_string="& | <a href='../admin'>Etherpad admin</a>" --target_file=$install_dir/node_modules/ep_etherpad-lite/plugin_packages/ep_mypads/static/l10n/fr.json
+
 	# Find the /div just after the field to open a pad in order to add a link to MyPads plugin.
 	sed -i '157i<center><br><font size="4"><a href="./mypads/" style="text-decoration: none; color: #555">MyPads</a></font></center>' $install_dir/src/templates/index.html
 fi
 
 #=================================================
-# SETUP SYSTEMD
+# REAPPLY SYSTEM CONFIGURATIONS
 #=================================================
-ynh_script_progression --message="Configuring systemd service..." --weight=2
+ynh_script_progression --message="Upgrading system configurations related to $app..." --weight=1
+
+ynh_add_nginx_config
 
 ynh_add_systemd_config
 
@@ -223,7 +184,7 @@ ynh_use_logrotate --non-append --specific_user=$app/$app
 #=================================================
 ynh_script_progression --message="Starting systemd service..." --weight=9
 
-ynh_systemd_action --service_name=$app --action=restart --line_match="You can access your Etherpad instance at" --log_path="/var/log/$app/etherpad.log" --timeout="120"
+ynh_systemd_action --service_name=$app --action=restart --line_match="Your Etherpad version is" --log_path="systemd"
 
 #=================================================
 # UPGRADE FAIL2BAN

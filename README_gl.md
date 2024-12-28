@@ -5,7 +5,9 @@ NON debe editarse manualmente.
 
 # Etherpad MyPads para YunoHost
 
-[![Nivel de integración](https://dash.yunohost.org/integration/etherpad_mypads.svg)](https://dash.yunohost.org/appci/app/etherpad_mypads) ![Estado de funcionamento](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.status.svg) ![Estado de mantemento](https://ci-apps.yunohost.org/ci/badges/etherpad_mypads.maintain.svg)
+[![Nivel de integración](https://apps.yunohost.org/badge/integration/etherpad_mypads)](https://ci-apps.yunohost.org/ci/apps/etherpad_mypads/)
+![Estado de funcionamento](https://apps.yunohost.org/badge/state/etherpad_mypads)
+![Estado de mantemento](https://apps.yunohost.org/badge/maintained/etherpad_mypads)
 
 [![Instalar Etherpad MyPads con YunoHost](https://install-app.yunohost.org/install-with-yunohost.svg)](https://install-app.yunohost.org/?app=etherpad_mypads)
 
@@ -23,18 +25,13 @@ This version of Etherpad is preconfigured with a collection of plugins:
 - [ep_mypads](https://www.npmjs.com/package/ep_mypads) - *Groups and private pads for etherpad*
 - [ep_align](https://www.npmjs.com/package/ep_align) - *Add Left/Center/Right/Justify alignment*
 - [ep_author_hover](https://www.npmjs.com/package/ep_author_hover) - *Display author names when hovereing text*
-- [ep_comments_page](https://www.npmjs.com/package/ep_comments_page) - *Add comments on sidebar and link it to the text.*
-- [ep_countable](https://www.npmjs.com/package/ep_countable) - *Add paragraphs, words and characters count*
 - [ep_delete_empty_pads](https://www.npmjs.com/package/ep_delete_empty_pads) - *Delete pads which were never edited*
-- [ep_font_color](https://www.npmjs.com/package/ep_font_color) - *Be able to change font color*
 - [ep_font_size](https://www.npmjs.com/package/ep_font_size) - *Be able to change font size*
 - [ep_headings2](https://www.npmjs.com/package/ep_headings2) - *Be able to set text as headers*
-- [ep_markdown](https://www.npmjs.com/package/ep_markdown) - *Edit and export as Markdown*
-- [ep_spellcheck](https://www.npmjs.com/package/ep_spellcheck) - *Add spell checking*
-- [ep_subscript_and_superscript](https://www.npmjs.com/package/ep_subscript_and_superscript) - *Support for subscript and superscript*
 
 
-**Versión proporcionada:** 1.9.1~ynh3
+
+**Versión proporcionada:** 2.2.7~ynh1
 
 **Demo:** <https://video.etherpad.com>
 

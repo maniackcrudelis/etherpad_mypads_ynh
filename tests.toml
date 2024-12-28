@@ -17,22 +17,22 @@ test_format = 1.0
     # Commits to test upgrade from
     # -------------------------------
 
-    test_upgrade_from.4d613658.name = "1.8.17"
+    test_upgrade_from.4e8049b31708b9f0223ee1a6ca8f153f04ec7e40.name = "1.9.1"
 
 
-[with_mypads]
+[with_MyPads]
     args.export = "libreoffice"
     args.mypads = 1
     args.useldap = 1
     only = ["install.root"]
 
-[with_abiword]
+[with_Abiword]
     args.export = "abiword"
     args.mypads = 0
     args.useldap = 0
     only = ["install.root"]
 
-[with_libreoffice]
+[with_Libreoffice]
     args.export = "libreoffice"
     args.mypads = 0
     args.useldap = 0
