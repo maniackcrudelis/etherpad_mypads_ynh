@@ -17,7 +17,8 @@ admindoc = "http://etherpad.org/doc/v1.9.0"
 code = "https://github.com/ether/etherpad-lite"
 
 [integration]
-yunohost = ">= 11.2"
+yunohost = ">= 12.0.9"
+helpers_version = "2.1"
 architectures = ["arm64", "amd64"]
 multi_instance = true
 
@@ -95,10 +96,10 @@ ram.runtime = "50M"
     [resources.permissions]
     main.url = "/"
     api.show_tile = false
-    admin.url = "/admin"
-    admin.auth_header = false
-    admin.allowed = ["admins"]
-    admin.show_tile = false
+    #admin.url = "/admin"
+    #admin.auth_header = false
+    #admin.allowed = ["admins"]
+    #admin.show_tile = false
 
     [resources.apt]
     packages = "mariadb-server"

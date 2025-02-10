@@ -1,15 +1,5 @@
 #!/bin/bash
 
-#=================================================
-# GENERIC STARTING
-#=================================================
-# IMPORT GENERIC HELPERS
-#=================================================
-
-if [ ${PACKAGE_CHECK_EXEC:-0} -eq 1 ]; then
-	sleep 60
-fi
-
 source _common.sh
 source /usr/share/yunohost/helpers
 
@@ -20,23 +10,18 @@ source /usr/share/yunohost/helpers
 ynh_maintenance_mode_ON
 
 #=================================================
-# STANDARD MODIFICATIONS
-#=================================================
 # MODIFY URL IN NGINX CONF
 #=================================================
-ynh_script_progression --message="Updating NGINX web server configuration..." --weight=3
+ynh_script_progression "Updating NGINX web server configuration..."
 
-ynh_change_url_nginx_config
+ynh_config_change_url_nginx
 
-#=================================================
-# GENERIC FINALISATION
 #=================================================
 # START SYSTEMD SERVICE
 #=================================================
-ynh_script_progression --message="Starting a systemd service..." --weight=10
+ynh_script_progression "Starting $app's systemd service..."
 
-# Start a systemd service
-ynh_systemd_action --service_name=$app --action=restart --line_match="Your Etherpad version is" --log_path="systemd"
+ynh_systemctl --service=$app --action=restart --wait_until="Your Etherpad version is" --log_path="/var/log/$app/etherpad.log"
 
 #=================================================
 # DEACTIVE MAINTENANCE MODE
@@ -48,4 +33,4 @@ ynh_maintenance_mode_OFF
 # END OF SCRIPT
 #=================================================
 
-ynh_script_progression --message="Change of URL completed for $app" --last
+ynh_script_progression "Change of URL completed for $app"
